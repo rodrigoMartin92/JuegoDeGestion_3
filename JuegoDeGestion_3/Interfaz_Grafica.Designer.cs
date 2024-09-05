@@ -53,6 +53,8 @@
             listBox6 = new ListBox();
             label1 = new Label();
             listBox1 = new ListBox();
+            button5 = new Button();
+            textBox2 = new TextBox();
             groupBox4.SuspendLayout();
             groupBox3.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -84,7 +86,6 @@
             comboBox2.Size = new Size(275, 23);
             comboBox2.TabIndex = 13;
             comboBox2.SelectedIndexChanged += comboBox2_SelectedIndexChanged;
-
             // 
             // label8
             // 
@@ -138,7 +139,6 @@
             listBox5.Size = new Size(278, 214);
             listBox5.TabIndex = 7;
             listBox5.SelectedIndexChanged += listBox5_SelectedIndexChanged;
-
             // 
             // listBox4
             // 
@@ -149,7 +149,6 @@
             listBox4.Size = new Size(275, 214);
             listBox4.TabIndex = 3;
             listBox4.SelectedIndexChanged += listBox4_SelectedIndexChanged;
-
             // 
             // groupBox3
             // 
@@ -164,8 +163,6 @@
             groupBox3.TabIndex = 13;
             groupBox3.TabStop = false;
             groupBox3.Text = "groupBox3";
-            listBox3.SelectedIndexChanged += listBox3_SelectedIndexChanged;
-
             // 
             // label4
             // 
@@ -193,7 +190,6 @@
             comboBox1.Size = new Size(176, 23);
             comboBox1.TabIndex = 3;
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
-
             // 
             // listBox3
             // 
@@ -203,6 +199,7 @@
             listBox3.Name = "listBox3";
             listBox3.Size = new Size(236, 259);
             listBox3.TabIndex = 4;
+            listBox3.SelectedIndexChanged += listBox3_SelectedIndexChanged;
             // 
             // listBox2
             // 
@@ -215,6 +212,8 @@
             // 
             // groupBox2
             // 
+            groupBox2.Controls.Add(textBox2);
+            groupBox2.Controls.Add(button5);
             groupBox2.Controls.Add(button4);
             groupBox2.Controls.Add(button3);
             groupBox2.Controls.Add(button2);
@@ -228,7 +227,7 @@
             // 
             // button4
             // 
-            button4.Location = new Point(218, 22);
+            button4.Location = new Point(248, 22);
             button4.Name = "button4";
             button4.Size = new Size(100, 85);
             button4.TabIndex = 3;
@@ -238,7 +237,7 @@
             // 
             // button3
             // 
-            button3.Location = new Point(112, 22);
+            button3.Location = new Point(142, 22);
             button3.Name = "button3";
             button3.Size = new Size(100, 85);
             button3.TabIndex = 2;
@@ -248,7 +247,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(324, 22);
+            button2.Location = new Point(354, 22);
             button2.Name = "button2";
             button2.Size = new Size(100, 85);
             button2.TabIndex = 1;
@@ -260,7 +259,7 @@
             // 
             button1.Location = new Point(6, 22);
             button1.Name = "button1";
-            button1.Size = new Size(100, 85);
+            button1.Size = new Size(130, 39);
             button1.TabIndex = 0;
             button1.Text = "Create";
             button1.UseVisualStyleBackColor = true;
@@ -315,6 +314,23 @@
             listBox1.Size = new Size(191, 94);
             listBox1.TabIndex = 2;
             // 
+            // button5
+            // 
+            button5.Location = new Point(6, 67);
+            button5.Name = "button5";
+            button5.Size = new Size(76, 40);
+            button5.TabIndex = 4;
+            button5.Text = "button5";
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
+            // 
+            // textBox2
+            // 
+            textBox2.Location = new Point(88, 76);
+            textBox2.Name = "textBox2";
+            textBox2.Size = new Size(48, 23);
+            textBox2.TabIndex = 5;
+            // 
             // Interfaz_Grafica
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -331,6 +347,7 @@
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
             groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ResumeLayout(false);
@@ -363,5 +380,7 @@
         private ListBox listBox6;
         private Label label1;
         private ListBox listBox1;
+        private TextBox textBox2;
+        private Button button5;
     }
 }
