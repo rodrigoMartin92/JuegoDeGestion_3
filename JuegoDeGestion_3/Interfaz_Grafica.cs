@@ -19,6 +19,14 @@ namespace JuegoDeGestion_3
         public enum Game_Troops_Category { Troop_Basic1, Troop_Advanced1 }
         public enum Game_EnemyType { Enemy_Basic1, Enemy_Advanced1 }
         // ------------------------------------------------ ACTUALIZACION DE DATOS ------------------------------------------------
+        private void UpdateTroopList(ListBox listBox4)
+        {
+            listBox4.Items.Clear();
+            foreach (var troop in createdTroops)
+            {
+                listBox4.Items.Add(troop);
+            }
+        }
         // ------------------------------------------------ ACTUALIZACION DE UI ------------------------------------------------
         public Interfaz_Grafica()
         {
@@ -346,10 +354,9 @@ namespace JuegoDeGestion_3
                     return null;
             }
         }
-        // Método para generar enemigos aleatoriamente hasta que la fuerza restante sea menor a 10
         public void Enemy_RandomGeneration(List<int> list_RandomNumbers, int enemy_AttackForce_Remaining, out List<Game_Enemies> createdEnemies, ListBox listBox, ref ListBox listBox2, ref int Enemy_AttackForce_Remaining)
         {
-            createdEnemies = new List<Game_Enemies>(); // Inicializar 'createdEnemies' al inicio para evitar el error
+            createdEnemies = new List<Game_Enemies>();
             try
             {
                 listBox2.Items.Clear();
@@ -359,33 +366,38 @@ namespace JuegoDeGestion_3
                 {
                     if (enemy_AttackForce_Remaining_Function < 10)
                     {
-                        break; // Detener generación de enemigos si el ataque restante es menor a 10.
+                        break;
                     }
 
-                    Game_Enemies? enemyCreated = null;
-                    if (enemy_AttackForce_Remaining_Function >= 10 && enemy_AttackForce_Remaining_Function < 30)
-                    {
-                        enemyCreated = Create_Enemy("Enemy_Basic1", ref listBox);
-                        enemy_AttackForce_Remaining_Function -= 10;
-                    }
-                    else
-                    {
-                        enemyCreated = Enemy_Creation(randomNumber, ref listBox2);
-                        if (enemyCreated != null)
-                        {
-                            enemy_AttackForce_Remaining_Function -= enemyCreated.Enemy_CreationCost;
-                        }
-                    }
+                    Game_Enemies? enemyCreated = GenerateEnemyBasedOnAttackForce(enemy_AttackForce_Remaining_Function, randomNumber, ref listBox, ref listBox2);
 
                     if (enemyCreated != null)
                     {
                         createdEnemies.Add(enemyCreated);
+                        enemy_AttackForce_Remaining_Function -= enemyCreated.Enemy_CreationCost;
                     }
                 }
                 Enemy_AttackForce_Remaining = enemy_AttackForce_Remaining_Function;
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
+
+        private Game_Enemies? GenerateEnemyBasedOnAttackForce(int remainingAttackForce, int randomNumber, ref ListBox listBox, ref ListBox listBox2)
+        {
+            Game_Enemies? enemyCreated = null;
+
+            if (remainingAttackForce >= 10 && remainingAttackForce < 30)
+            {
+                enemyCreated = Create_Enemy("Enemy_Basic1", ref listBox);
+            }
+            else
+            {
+                enemyCreated = Enemy_Creation(randomNumber, ref listBox2);
+            }
+
+            return enemyCreated;
+        }
+
         public void CountInstances()
         {
             try
@@ -417,67 +429,66 @@ namespace JuegoDeGestion_3
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
-        // Método para que una tropa ataque a un enemigo
         public void Troop_Attack(Game_Troops attackingTroop, ref ListBox listBox5)
         {
-            string Lista_Revision;
             try
             {
                 if (createdEnemies.Count > 0)
                 {
-                    Random random = new Random();
-                    int index = random.Next(createdEnemies.Count);
-                    Game_Enemies targetedEnemy = createdEnemies[index];
-
-                    targetedEnemy.Enemy_HitPoints_Remaining -= attackingTroop.Troop_Damage;
-
-                    Lista_Revision = attackingTroop.Troop_Damage.ToString();
+                    Game_Enemies targetedEnemy = SelectRandomEnemy();
+                    ApplyDamageToEnemy(attackingTroop, targetedEnemy);
 
                     if (targetedEnemy.Enemy_HitPoints_Remaining <= 0)
                     {
                         createdEnemies.Remove(targetedEnemy);
-                        listBox5.Items.Remove(targetedEnemy);
-
-                        // Actualiza la interfaz para reflejar la eliminación del enemigo
-                        listBox5.Items.Clear();
-                        foreach (var enemy in createdEnemies)
-                        {
-                            listBox5.Items.Add(enemy);
-                        }
+                        UpdateEnemyList(listBox5);
                     }
                 }
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
+        private Game_Enemies SelectRandomEnemy()
+        {
+            Random random = new Random();
+            int index = random.Next(createdEnemies.Count);
+            return createdEnemies[index];
+        }
+        private void ApplyDamageToEnemy(Game_Troops attackingTroop, Game_Enemies targetedEnemy)
+        {
+            targetedEnemy.Enemy_HitPoints_Remaining -= attackingTroop.Troop_Damage;
+        }
+
+        private void UpdateEnemyList(ListBox listBox5)
+        {
+            listBox5.Items.Clear();
+            foreach (var enemy in createdEnemies)
+            {
+                listBox5.Items.Add(enemy);
+            }
+        }
         public void Full_Troop_Attack(Game_Troops attackingTroop, ref ListBox listBox5)
         {
-            List<string> Lista_Revision_F2 = new List<string>();
             try
             {
                 if (createdEnemies.Count == 0)
                 {
                     return;
                 }
-                int NumberOfTroopAttacks = attackingTroop.Troop_NumberOfAttacks;
-                for (int i = 0; i < NumberOfTroopAttacks; i++)
+
+                for (int i = 0; i < attackingTroop.Troop_NumberOfAttacks; i++)
                 {
                     if (createdEnemies.Count == 0)
                     {
-                        // Si no quedan enemigos, terminar los ataques restantes
                         break;
                     }
+
                     Troop_Attack(attackingTroop, ref listBox5);
                 }
-                // Actualizar la interfaz después de todos los ataques
-                listBox5.Items.Clear();
-                foreach (var enemy in createdEnemies)
-                {
-                    listBox5.Items.Add(enemy);
-                }
+
+                UpdateEnemyList(listBox5);
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
-        // Método para que todas las tropas del jugador ataquen
         public void Player_Attack(ref ListBox listBox5)
         {
             try
@@ -487,15 +498,11 @@ namespace JuegoDeGestion_3
                     Full_Troop_Attack(troop, ref listBox5);
                 }
 
-                // Actualiza la interfaz después de que todas las tropas han atacado
-                listBox5.Items.Clear();
-                foreach (var enemy in createdEnemies)
-                {
-                    listBox5.Items.Add(enemy);
-                }
+                UpdateEnemyList(listBox5);
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
+
         public void Full_Player_Attack()
         {
         }
@@ -564,14 +571,12 @@ namespace JuegoDeGestion_3
                     Full_Enemy_Attack(enemy, ref listBox4);
                 }
 
-                // Actualiza la interfaz después de que todos los enemigos han atacado
-                listBox4.Items.Clear();
-                foreach (var troop in createdTroops)
-                {
-                    listBox4.Items.Add(troop);
-                }
+                UpdateTroopList(listBox4);
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
+
+
+
     }
 }

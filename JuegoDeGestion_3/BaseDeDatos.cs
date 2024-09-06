@@ -8,5 +8,6 @@ namespace JuegoDeGestion_3
 {
     internal class BaseDeDatos
     {
+
     }
 }
