@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 namespace JuegoDeGestion_3
 {
@@ -12,7 +13,7 @@ namespace JuegoDeGestion_3
         internal List<Game_Building> createdBuildings = new List<Game_Building>();
         internal List<Game_Troops> createdTroops = new List<Game_Troops>();
         private List<Game_Enemies> createdEnemies = new List<Game_Enemies>();
-        public int Enemy_AttackForce = 0; public int Enemy_AttackForce_Remaining = 0;
+        public int Enemy_AttackForce = 0; public int Enemy_AttackForce_Remaining = 0; public int NumeroDeUnidadesACrear;
         public enum Game_Categories { Buildings, Troops }
         public enum Game_Difficulty { Dificult_1, Dificult_2 }
         public enum Game_Building_Category { Building_Main_Fortress, Building_Resource1Gathering }
@@ -27,6 +28,17 @@ namespace JuegoDeGestion_3
                 listBox4.Items.Add(troop);
             }
         }
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            int unidades;
+            if (int.TryParse(textBox2.Text, out unidades))
+            {
+                if (unidades > 0) { NumeroDeUnidadesACrear = unidades; }
+                else { MessageBox.Show("Coloca un número mayor a 0"); }
+            }
+            else { MessageBox.Show("Introduce un número válido"); }
+        }
+
         // ------------------------------------------------ ACTUALIZACION DE UI ------------------------------------------------
         public Interfaz_Grafica()
         {
@@ -49,7 +61,7 @@ namespace JuegoDeGestion_3
                 { listBox2.Items.AddRange(Enum.GetNames(typeof(Game_Troops_Category))); }
             }
             catch (Exception ex)
-            {                MessageBox.Show(ex.ToString());            }
+            { MessageBox.Show(ex.ToString()); }
         }
         private void listBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -147,8 +159,19 @@ namespace JuegoDeGestion_3
 
         }
         private void button4_Click(object sender, EventArgs e) { }
-        private void button5_Click(object sender, EventArgs e) { }
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string Selected_Element = listBox2.SelectedItem.ToString();
+            MultipleCreation(NumeroDeUnidadesACrear, Selected_Element);
+        }
         // ------------------------------------------------ FUNCIONES ------------------------------------------------
+        private void MultipleCreation(int NumeroDeUnidadesACrear, string Selected_Element)
+        {
+            for (int i = 0; i < NumeroDeUnidadesACrear; i++)
+            {
+                Create_Building_Troop(Selected_Element, ref listBox1, ref listBox4, ref Resource1_Amount);
+            }
+        }
         // Métodos para contar instancias de edificios y tropas creadas
         public (Dictionary<string, int> buildingCounts, Dictionary<string, int> troopCounts) CountInstancesData()
         {
@@ -575,7 +598,6 @@ namespace JuegoDeGestion_3
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
-
 
 
     }

@@ -44,6 +44,8 @@
             listBox3 = new ListBox();
             listBox2 = new ListBox();
             groupBox2 = new GroupBox();
+            textBox2 = new TextBox();
+            button5 = new Button();
             button4 = new Button();
             button3 = new Button();
             button2 = new Button();
@@ -53,8 +55,6 @@
             listBox6 = new ListBox();
             label1 = new Label();
             listBox1 = new ListBox();
-            button5 = new Button();
-            textBox2 = new TextBox();
             groupBox4.SuspendLayout();
             groupBox3.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -225,6 +225,24 @@
             groupBox2.TabStop = false;
             groupBox2.Text = "groupBox2";
             // 
+            // textBox2
+            // 
+            textBox2.Location = new Point(88, 76);
+            textBox2.Name = "textBox2";
+            textBox2.Size = new Size(48, 23);
+            textBox2.TabIndex = 5;
+            textBox2.TextChanged += textBox2_TextChanged;
+            // 
+            // button5
+            // 
+            button5.Location = new Point(6, 67);
+            button5.Name = "button5";
+            button5.Size = new Size(76, 40);
+            button5.TabIndex = 4;
+            button5.Text = "button5";
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
+            // 
             // button4
             // 
             button4.Location = new Point(248, 22);
@@ -313,23 +331,6 @@
             listBox1.Name = "listBox1";
             listBox1.Size = new Size(191, 94);
             listBox1.TabIndex = 2;
-            // 
-            // button5
-            // 
-            button5.Location = new Point(6, 67);
-            button5.Name = "button5";
-            button5.Size = new Size(76, 40);
-            button5.TabIndex = 4;
-            button5.Text = "button5";
-            button5.UseVisualStyleBackColor = true;
-            button5.Click += button5_Click;
-            // 
-            // textBox2
-            // 
-            textBox2.Location = new Point(88, 76);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(48, 23);
-            textBox2.TabIndex = 5;
             // 
             // Interfaz_Grafica
             // 
