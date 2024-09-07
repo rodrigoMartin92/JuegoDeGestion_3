@@ -38,26 +38,7 @@ namespace JuegoDeGestion_3
             }
             else { MessageBox.Show("Introduce un número válido"); }
         }
-        public static void AgregarBuildings()
-        {
-            // Agregar algunos edificios
-            BaseDeDatos.AgregarBuilding("Main Fortress", 1000, 200);
-            BaseDeDatos.AgregarBuilding("Wood Gathering", 500, 100);
-        }
 
-        public static void AgregarTroops()
-        {
-            // Agregar algunas tropas
-            BaseDeDatos.AgregarTroop("Basic Troop", 150, 10, 1, 5, 10);
-            BaseDeDatos.AgregarTroop("Advanced Troop", 250, 20, 2, 10, 30);
-        }
-
-        public static void AgregarEnemys()
-        {
-            // Agregar algunos enemigos
-            BaseDeDatos.AgregarEnemy("Basic Enemy", 150, 10, 1, 5);
-            BaseDeDatos.AgregarEnemy("Advanced Enemy", 250, 20, 2, 10);
-        }
         // ------------------------------------------------ ACTUALIZACION DE UI ------------------------------------------------
         public Interfaz_Grafica()
         {
@@ -189,6 +170,53 @@ namespace JuegoDeGestion_3
             MultipleCreation(NumeroDeUnidadesACrear, Selected_Element);
         }
         // ------------------------------------------------ FUNCIONES ------------------------------------------------
+
+
+        // Verificar si aún quedan enemigos vivos
+        public bool AreEnemiesAlive()
+        {
+            foreach (var enemy in createdEnemies)
+            {
+                if (enemy.Enemy_HitPoints_Remaining > 0)
+                {
+                    return true; // Hay al menos un enemigo vivo
+                }
+            }
+            return false; // No hay enemigos vivos
+        }
+
+        // Verificar si hay al menos un edificio "Building_Main_Fortress"
+        public bool HasMainFortress()
+        {
+            foreach (var building in createdBuildings)
+            {
+                if (building is Building_Main_Fortress)
+                {
+                    return true; // Se encontró una fortaleza principal
+                }
+            }
+            return false; // No hay fortaleza principal
+        }
+
+        // Función para verificar si el jugador puede pasar de turno
+        public bool CanPassTurn()
+        {
+            if (AreEnemiesAlive())
+            {
+                MessageBox.Show("No puedes pasar de turno, aún hay enemigos vivos.");
+                return false;
+            }
+
+            if (!HasMainFortress())
+            {
+                MessageBox.Show("No puedes pasar de turno, necesitas al menos un edificio 'Main Fortress'.");
+                return false;
+            }
+
+            // Si no hay enemigos y tienes la fortaleza, puedes pasar de turno
+            return true;
+        }
+
         private void MultipleCreation(int NumeroDeUnidadesACrear, string Selected_Element)
         {
             for (int i = 0; i < NumeroDeUnidadesACrear; i++)
@@ -232,30 +260,33 @@ namespace JuegoDeGestion_3
         {
             try
             {
-                Turnos++; // Incrementar el número de turnos
-                int FuerzaDeAtaque;
-                Add_Resources(listBox, ref Resource1_Amount); // Agregar recursos
-                // Aumentar la fuerza de los enemigos según la dificultad
-                switch (Dificultad)
+                if (CanPassTurn())
                 {
-                    case 1:
-                        Increase_EnemyStrength(Game_Difficulty.Dificult_1, ref Enemy_AttackForce, ref Enemy_AttackForce_Remaining);
-                        break;
-                    case 2:
-                        Increase_EnemyStrength(Game_Difficulty.Dificult_2, ref Enemy_AttackForce, ref Enemy_AttackForce_Remaining);
-                        break;
-                    default:
-                        throw new ArgumentException("Dificultad no válida");
+                    Turnos++; // Incrementar el número de turnos
+                    int FuerzaDeAtaque;
+                    Add_Resources(listBox, ref Resource1_Amount); 
+                    switch (Dificultad)
+                    {
+                        case 1:
+                            Increase_EnemyStrength(Game_Difficulty.Dificult_1, ref Enemy_AttackForce, ref Enemy_AttackForce_Remaining);
+                            break;
+                        case 2:
+                            Increase_EnemyStrength(Game_Difficulty.Dificult_2, ref Enemy_AttackForce, ref Enemy_AttackForce_Remaining);
+                            break;
+                        default:
+                            throw new ArgumentException("Dificultad no válida");
+                    }
+                    FuerzaDeAtaque = Enemy_AttackForce;
+                    List<int> Enemies_RandomNumbers = GenerateEnemies_RandomNumbers(1, 2, 30); // Generar números aleatorios para enemigos
+                    Enemy_RandomGeneration(Enemies_RandomNumbers, Enemy_AttackForce, out createdEnemies, listBox2, ref listBox5, ref Enemy_AttackForce_Remaining); // Generar enemigos aleatoriamente
+                    return FuerzaDeAtaque;
                 }
-                FuerzaDeAtaque = Enemy_AttackForce;
-                List<int> Enemies_RandomNumbers = GenerateEnemies_RandomNumbers(1, 2, 30); // Generar números aleatorios para enemigos
-                Enemy_RandomGeneration(Enemies_RandomNumbers, Enemy_AttackForce, out createdEnemies, listBox2, ref listBox5, ref Enemy_AttackForce_Remaining); // Generar enemigos aleatoriamente
-                return FuerzaDeAtaque;
+                return 0;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString()); // Mostrar mensaje de error si algo sale mal
-                return -1; // Retornar un valor por defecto en caso de error
+                return 0; 
             }
         }
         // Método para aumentar la fuerza de los enemigos según la dificultad
@@ -290,69 +321,74 @@ namespace JuegoDeGestion_3
                 listBox.Items.Add("Resource1 = " + Resource1_Amount);
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
-        }
-        // Método para crear edificios o tropas
-        public void Create_Building_Troop(string Building_Troop, ref ListBox listBox1, ref ListBox listBox2, ref int Resource1_Amount)
+        }// Método para crear edificios o tropas
+        public void Create_Building_Troop(string buildingTroopName, ref ListBox listBox1, ref ListBox listBox2, ref int resource1Amount)
         {
             try
             {
                 // Diccionario que mapea el nombre del edificio/tropa con una función que crea una instancia de ese tipo
-                var creationMap = new Dictionary<string, Func<object>>()
+                var creationMap = new Dictionary<string, Func<object>>
                 {
                     { "Building_Main_Fortress", () => new Building_Main_Fortress() },
                     { "Building_Resource1Gathering", () => new Building_Resource1Gathering() },
                     { "Troop_Basic1", () => new Troop_Basic1() },
                     { "Troop_Advanced1", () => new Troop_Advanced1() }
                 };
-                var costMap = new Dictionary<string, int>()
+
+                // Mapeo de costos basado en el nombre
+                var costMap = new Dictionary<string, int>
                 {
                     { "Building_Main_Fortress", (int)BaseDeDatos.Buildings[0][2] },
-                    { "Building_Resource1Gathering", (int)BaseDeDatos.Buildings[1][2]  },
-                    { "Troop_Basic1", (int)BaseDeDatos.Troops[0][4]  },
-                    { "Troop_Advanced1", (int)BaseDeDatos.Troops[1][4]  }
+                    { "Building_Resource1Gathering", (int)BaseDeDatos.Buildings[1][2] },
+                    { "Troop_Basic1", (int)BaseDeDatos.Troops[0][4] },
+                    { "Troop_Advanced1", (int)BaseDeDatos.Troops[1][4] }
                 };
-                if (creationMap.ContainsKey(Building_Troop))
-                {
-                    var instance = creationMap[Building_Troop]();
-                    int cost = 0;
-                    // Si la instancia es un edificio
-                    if (instance is Game_Building building)
-                    {
-                        cost = building.Building_Resource1_Cost;
-                        createdBuildings.Add(building);
-                    }
-                    // Si la instancia es una tropa
-                    else if (instance is Game_Troops troop)
-                    {
-                        cost = troop.Troop_Resource1_Cost;
-                        createdTroops.Add(troop);
 
-                        // Agregar la tropa creada individualmente a la listBox4
-                        listBox2.Items.Add(troop);
-                    }
-                    // Restar el costo de producción de Resource1_Amount
-                    if (Resource1_Amount >= cost)
-                    {
-                        Resource1_Amount -= cost;
-                    }
-                    else
-                    {
-                        MessageBox.Show("No tienes suficientes recursos para crear este elemento.");
-                        return;
-                    }
-                    // Actualizar la listBox1 con la nueva cantidad de Resource1
-                    listBox1.Items.Clear();
-                    listBox1.Items.Add("Resource1 = " + Resource1_Amount);
+                if (!costMap.TryGetValue(buildingTroopName, out int cost) || !creationMap.ContainsKey(buildingTroopName))
+                {
+                    MessageBox.Show("Error in 'Create_Building_Troop'");
+                    return;
+                }
+
+                if (resource1Amount < cost)
+                {
+                    MessageBox.Show("No tienes suficientes recursos para crear este elemento.");
+                    return;
+                }
+
+                // Crear la instancia y ajustar el costo
+                var instance = creationMap[buildingTroopName]();
+                if (instance is Game_Building building)
+                {
+                    createdBuildings.Add(building);
+                    cost = building.Building_Resource1_Cost;
+                }
+                else if (instance is Game_Troops troop)
+                {
+                    createdTroops.Add(troop);
+                    listBox2.Items.Add(troop);
+                    cost = troop.Troop_Resource1_Cost;
                 }
                 else
                 {
-                    MessageBox.Show("Error in 'Create_Building_Troop'"); // Mostrar mensaje si no se encuentra el elemento
+                    MessageBox.Show("Error en el tipo de instancia creada.");
+                    return;
                 }
-                // Llamar a la función para contar las instancias creadas
+
+                // Restar el costo y actualizar la listBox1
+                resource1Amount -= cost;
+                listBox1.Items.Clear();
+                listBox1.Items.Add($"Resource1 = {resource1Amount}");
+
+                // Contar las instancias creadas
                 CountInstances();
             }
-            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
+
 
 
         // Método para generar una lista de números aleatorios dentro de un rango específico
@@ -528,7 +564,6 @@ namespace JuegoDeGestion_3
                 {
                     return;
                 }
-
                 for (int i = 0; i < attackingTroop.Troop_NumberOfAttacks; i++)
                 {
                     if (createdEnemies.Count == 0)
@@ -564,10 +599,6 @@ namespace JuegoDeGestion_3
             {
                 MessageBox.Show(ex.ToString());
             }
-        }
-
-        public void Full_Player_Attack()
-        {
         }
         public void Enemy_Attack(Game_Enemies attackingEnemy, ref ListBox listBox4)
         {
