@@ -239,7 +239,7 @@
             button5.Name = "button5";
             button5.Size = new Size(76, 40);
             button5.TabIndex = 4;
-            button5.Text = "button5";
+            button5.Text = "Create x";
             button5.UseVisualStyleBackColor = true;
             button5.Click += button5_Click;
             // 
@@ -249,7 +249,7 @@
             button4.Name = "button4";
             button4.Size = new Size(100, 85);
             button4.TabIndex = 3;
-            button4.Text = "Repara edificio";
+            button4.Text = "Reparar edificio";
             button4.UseVisualStyleBackColor = true;
             button4.Click += button4_Click;
             // 

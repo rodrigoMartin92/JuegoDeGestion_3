@@ -38,7 +38,26 @@ namespace JuegoDeGestion_3
             }
             else { MessageBox.Show("Introduce un número válido"); }
         }
+        public static void AgregarBuildings()
+        {
+            // Agregar algunos edificios
+            BaseDeDatos.AgregarBuilding("Main Fortress", 1000, 200);
+            BaseDeDatos.AgregarBuilding("Wood Gathering", 500, 100);
+        }
 
+        public static void AgregarTroops()
+        {
+            // Agregar algunas tropas
+            BaseDeDatos.AgregarTroop("Basic Troop", 150, 10, 1, 5, 10);
+            BaseDeDatos.AgregarTroop("Advanced Troop", 250, 20, 2, 10, 30);
+        }
+
+        public static void AgregarEnemys()
+        {
+            // Agregar algunos enemigos
+            BaseDeDatos.AgregarEnemy("Basic Enemy", 150, 10, 1, 5);
+            BaseDeDatos.AgregarEnemy("Advanced Enemy", 250, 20, 2, 10);
+        }
         // ------------------------------------------------ ACTUALIZACION DE UI ------------------------------------------------
         public Interfaz_Grafica()
         {
@@ -48,6 +67,11 @@ namespace JuegoDeGestion_3
             comboBox2.Items.AddRange(Enum.GetNames(typeof(Game_Difficulty)));
             comboBox2.SelectedIndex = 0;
             listBox1.Items.Add("Resource1 = " + Resource1_Amount);
+
+            // Inicializa los datos de las listas al inicio
+            BaseDeDatos.AgregarBuildings();
+            BaseDeDatos.AgregarTroops();
+            BaseDeDatos.AgregarEnemys();
         }
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -119,7 +143,7 @@ namespace JuegoDeGestion_3
         }
         private void button3_Click(object sender, EventArgs e)
         {
-            Player_Attack(ref listBox5);
+            Player_Attack(ref listBox5, createdEnemies);
             Enemies_Attack_Player(ref listBox4);
         }
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
@@ -274,12 +298,19 @@ namespace JuegoDeGestion_3
             {
                 // Diccionario que mapea el nombre del edificio/tropa con una función que crea una instancia de ese tipo
                 var creationMap = new Dictionary<string, Func<object>>()
-        {
-            { "Building_Main_Fortress", () => new Building_Main_Fortress() },
-            { "Building_Resource1Gathering", () => new Building_Resource1Gathering() },
-            { "Troop_Basic1", () => new Troop_Basic1() },
-            { "Troop_Advanced1", () => new Troop_Advanced1() }
-        };
+                {
+                    { "Building_Main_Fortress", () => new Building_Main_Fortress() },
+                    { "Building_Resource1Gathering", () => new Building_Resource1Gathering() },
+                    { "Troop_Basic1", () => new Troop_Basic1() },
+                    { "Troop_Advanced1", () => new Troop_Advanced1() }
+                };
+                var costMap = new Dictionary<string, int>()
+                {
+                    { "Building_Main_Fortress", (int)BaseDeDatos.Buildings[0][2] },
+                    { "Building_Resource1Gathering", (int)BaseDeDatos.Buildings[1][2]  },
+                    { "Troop_Basic1", (int)BaseDeDatos.Troops[0][4]  },
+                    { "Troop_Advanced1", (int)BaseDeDatos.Troops[1][4]  }
+                };
                 if (creationMap.ContainsKey(Building_Troop))
                 {
                     var instance = creationMap[Building_Troop]();
@@ -512,10 +543,16 @@ namespace JuegoDeGestion_3
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
-        public void Player_Attack(ref ListBox listBox5)
+        public void Player_Attack(ref ListBox listBox5, List<Game_Enemies> createdEnemies)
         {
             try
             {
+                if (createdEnemies.Count == 0)
+                {
+                    MessageBox.Show("No enemies to attack.");
+                    return;
+                }
+
                 foreach (var troop in createdTroops)
                 {
                     Full_Troop_Attack(troop, ref listBox5);
@@ -523,7 +560,10 @@ namespace JuegoDeGestion_3
 
                 UpdateEnemyList(listBox5);
             }
-            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         public void Full_Player_Attack()
