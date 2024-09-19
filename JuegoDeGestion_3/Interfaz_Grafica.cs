@@ -19,6 +19,23 @@ namespace JuegoDeGestion_3
         public enum Game_Building_Category { Building_Main_Fortress, Building_Resource1Gathering }
         public enum Game_Troops_Category { Troop_Basic1, Troop_Advanced1 }
         public enum Game_EnemyType { Enemy_Basic1, Enemy_Advanced1 }
+
+
+        public Interfaz_Grafica()
+        {
+            InitializeComponent();
+            comboBox1.Items.AddRange(Enum.GetNames(typeof(Game_Categories)));
+            comboBox1.SelectedIndex = 0;
+            comboBox2.Items.AddRange(Enum.GetNames(typeof(Game_Difficulty)));
+            comboBox2.SelectedIndex = 0;
+            listBox1.Items.Add("Resource1 = " + Resource1_Amount);
+            textBox2.Text = "10";
+
+            // Inicializa los datos de las listas al inicio
+            BaseDeDatos.AgregarBuildings();
+            BaseDeDatos.AgregarTroops();
+            BaseDeDatos.AgregarEnemys();
+        }
         // ------------------------------------------------ ACTUALIZACION DE DATOS ------------------------------------------------
         private void UpdateTroopList(ListBox listBox4)
         {
@@ -40,20 +57,7 @@ namespace JuegoDeGestion_3
         }
 
         // ------------------------------------------------ ACTUALIZACION DE UI ------------------------------------------------
-        public Interfaz_Grafica()
-        {
-            InitializeComponent();
-            comboBox1.Items.AddRange(Enum.GetNames(typeof(Game_Categories)));
-            comboBox1.SelectedIndex = 0;
-            comboBox2.Items.AddRange(Enum.GetNames(typeof(Game_Difficulty)));
-            comboBox2.SelectedIndex = 0;
-            listBox1.Items.Add("Resource1 = " + Resource1_Amount);
 
-            // Inicializa los datos de las listas al inicio
-            BaseDeDatos.AgregarBuildings();
-            BaseDeDatos.AgregarTroops();
-            BaseDeDatos.AgregarEnemys();
-        }
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
